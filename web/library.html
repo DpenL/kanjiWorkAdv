@@ -1,0 +1,30 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Library — kanji-game building blocks</title><link rel="stylesheet" href="style.css"></head><body>
+<header class="kc"><h1>図書室 · The Library</h1><p>Everything an engineer needs to prototype a kanji mechanic this afternoon — and where educators publish</p></header>
+<main>
+<h2>Dictionaries &amp; core data <span class="tag">CC BY-SA</span></h2>
+<div class="card"><b><a href="https://www.edrdg.org/jmdict/j_jmdict.html">JMdict</a></b><small>The word dictionary (JP↔EN/DE/…, XML). Backbone for any vocabulary mechanic.</small></div>
+<div class="card"><b><a href="https://www.edrdg.org/wiki/index.php/KANJIDIC_Project">KANJIDIC2</a></b><small>Per-kanji readings, meanings, stroke counts, grades, frequency, JLPT. The kanji database.</small></div>
+<div class="card"><b><a href="https://www.edrdg.org/krad/kradinf.html">KRADFILE / RADKFILE</a></b><small>Kanji ⇄ radical decompositions — the data behind component/radical mechanics.</small></div>
+<h2>Strokes &amp; handwriting</h2>
+<div class="card"><b><a href="https://kanjivg.tagaini.net/">KanjiVG</a> <span class="tag">CC BY-SA</span></b><small>SVG stroke paths for every jōyō kanji — powers tracing, stroke-order animation (see the tracing kiosk next to this one), and lightweight handwriting matching.</small></div>
+<div class="card"><b><a href="https://github.com/tegaki/tegaki">Tegaki</a></b><small>Open-source handwriting recognition engines if you outgrow stroke matching.</small></div>
+<h2>Ordering, frequency &amp; JLPT lists</h2>
+<div class="card"><b><a href="https://www.tanos.co.uk/jlpt/">Tanos JLPT lists</a> <span class="tag">CC BY</span></b><small>The de-facto N5–N1 kanji/vocab lists for scoping a prototype.</small></div>
+<div class="card"><b><a href="https://github.com/scriptin/kanji-frequency">scriptin/kanji-frequency</a> · <a href="https://github.com/scriptin/topokanji">topokanji</a></b><small>Corpus frequency lists + components-before-compounds orderings.</small></div>
+<div class="card"><b><a href="https://github.com/davidluzgouveia/kanji-data">kanji-data</a> · <a href="https://github.com/mifunetoshiro/kanjium">kanjium</a></b><small>Prebuilt JSON merges (KANJIDIC + JLPT + WaniKani levels; pitch accent, variants).</small></div>
+<h2>Example sentences</h2>
+<div class="card"><b><a href="https://tatoeba.org">Tatoeba</a> <span class="tag">CC BY</span></b><small>Parallel example sentences (JP–EN–DE) for context/reading mechanics.</small></div>
+<h2>APIs &amp; libraries (browser-ready)</h2>
+<div class="card"><b><a href="https://kanjiapi.dev">kanjiapi.dev</a></b><small>Clean REST kanji API, CORS-friendly — the quiz kiosk next door runs on it.</small></div>
+<div class="card"><b><a href="https://docs.api.wanikani.com/">WaniKani API v2</a></b><small>Structured radical→kanji→vocab data (token required; mind their content terms).</small></div>
+<div class="card"><b><a href="https://github.com/WaniKani/WanaKana">wanakana</a> · <a href="https://github.com/hexenq/kuroshiro">kuroshiro</a> <span class="tag">MIT</span></b><small>Kana⇄romaji conversion; kanji→furigana rendering.</small></div>
+<div class="card"><b><a href="https://github.com/open-spaced-repetition/ts-fsrs">ts-fsrs</a> <span class="tag">MIT</span></b><small>Modern research-backed spaced-repetition scheduler — the default over SM-2 in 2026.</small></div>
+<h2>For the education side — where this field publishes</h2>
+<div class="card"><b><a href="https://www.lltjournal.org/">Language Learning &amp; Technology</a> · <a href="https://journal.jaltcall.org/">JALT CALL Journal</a></b><small>Open-access CALL journals; the JALT CALL Journal is Japan-focused.</small></div>
+<div class="card"><b><a href="https://calico.org/">CALICO</a> (Gaming SIG) · ReCALL · <a href="https://chiplay.acm.org/">CHI PLAY</a></b><small>Where educators and game researchers respectively meet — submit here, cite from here.</small></div>
+<h2>⚖ Data licenses — read before shipping</h2>
+<div class="card"><small><b>EDRDG files (JMdict, KANJIDIC2, KRADFILE)</b> and <b>KanjiVG</b> are CC BY-SA: credit the source, and if your app <i>displays</i> dictionary data live, the acknowledgement must be visible on those screens. Derivative data files inherit BY-SA (share-alike). Tatoeba is CC BY (credit only). Commercial use is allowed; attribution is not optional. Keep one visible credits screen in every prototype and you're fine.</small></div>
+<footer class="kc">Dictionary data © <a href="https://www.edrdg.org">EDRDG</a>, used under CC BY-SA · KanjiVG © Ulrich Apel, CC BY-SA · curated by the Kanji Commons community</footer>
+</main></body></html>

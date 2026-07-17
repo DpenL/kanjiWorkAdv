@@ -1,0 +1,41 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Stroke-order kiosk — KanjiVG</title><link rel="stylesheet" href="style.css"></head><body>
+<header class="kc"><h1>筆順 · Stroke-order kiosk</h1><p>Animated stroke order straight from KanjiVG SVG data</p></header>
+<main>
+<p><label>Kanji: <input id="in" value="字" maxlength="2" style="font-size:1.4rem;width:3.2rem;text-align:center"></label>
+<button class="kc" id="go">Draw ▶</button> <button class="kc" id="again" style="background:#3A5BA0">Replay</button></p>
+<div id="stage" style="background:#FFF8EC;border:1px solid #D8CDB8;border-radius:8px;max-width:340px;padding:8px"></div>
+<p id="status"><small>Fetches the SVG for the character live from the KanjiVG repository and animates each stroke in order — the same data your game can use for tracing or handwriting scoring.</small></p>
+<footer class="kc">Stroke data © Ulrich Apel — <a href="https://kanjivg.tagaini.net/">KanjiVG</a>, CC BY-SA. Keep this credit visible wherever the strokes are shown.</footer>
+</main>
+<script>
+var $=function(id){return document.getElementById(id)};
+function load(ch){
+  var cp=ch.codePointAt(0).toString(16).padStart(5,"0");
+  var url="https://raw.githubusercontent.com/KanjiVG/kanjivg/master/kanji/"+cp+".svg";
+  $("status").textContent="Loading "+ch+" …";
+  fetch(url).then(function(r){if(!r.ok)throw 0;return r.text()})
+  .then(function(svg){
+    $("stage").innerHTML=svg;
+    var el=$("stage").querySelector("svg");
+    el.removeAttribute("width");el.removeAttribute("height");el.style.width="100%";
+    var nums=el.querySelector('[id*="StrokeNumbers"]');if(nums)nums.style.display="none";
+    animate(el);$("status").textContent=ch+" — "+el.querySelectorAll("path").length+" strokes";
+  })
+  .catch(function(){$("status").textContent="Not found in KanjiVG (or offline). Try a common kanji like 学 or 語.";});
+}
+function animate(el){
+  var paths=[].slice.call(el.querySelectorAll("path"));
+  paths.forEach(function(p){p.style.stroke="#16161E";p.style.strokeWidth="3.5";p.style.fill="none";
+    var L=p.getTotalLength();p.style.strokeDasharray=L;p.style.strokeDashoffset=L;p.style.transition="none"});
+  var reduce=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  paths.forEach(function(p,i){
+    if(reduce){p.style.strokeDashoffset=0;return}
+    setTimeout(function(){p.style.transition="stroke-dashoffset .6s ease";p.style.strokeDashoffset=0},350*i+150);
+  });
+}
+$("go").onclick=function(){var v=$("in").value.trim();if(v)load(v)};
+$("again").onclick=function(){var el=$("stage").querySelector("svg");if(el)animate(el)};
+load("字");
+</script></body></html>

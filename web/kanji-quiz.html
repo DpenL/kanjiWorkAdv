@@ -1,0 +1,46 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Kanji quiz — live API demo</title><link rel="stylesheet" href="style.css"></head><body>
+<header class="kc"><h1>クイズ · Kanji quiz kiosk</h1><p>A ~100-line alpha mechanic running against a real dictionary API — fork me</p></header>
+<main>
+<p><small>Point of this kiosk: show that an engineer can test a mechanic against real data (<a href="https://kanjiapi.dev">kanjiapi.dev</a> → KANJIDIC2) with zero backend. Grade-1 kanji, meaning-recognition task.</small></p>
+<div class="big" id="kanji">…</div>
+<div class="grid2" id="options"></div>
+<p id="status">Loading kanji list…</p>
+<p><button class="kc" id="next" style="display:none">Next ▶</button>
+<span id="score" style="font-family:'DotGothic16',monospace"></span></p>
+<footer class="kc">Dictionary data © EDRDG (KANJIDIC2), CC BY-SA, served by kanjiapi.dev — this notice must stay visible wherever the data is shown.</footer>
+</main>
+<script>
+var API="https://kanjiapi.dev/v1", pool=[], score=0, streak=0, locked=false;
+var $=function(id){return document.getElementById(id)};
+function setStatus(m,cls){var s=$("status");s.textContent=m;s.className=cls||""}
+function shuffle(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=a[i];a[i]=a[j];a[j]=t}return a}
+function pick(n){var c=pool.slice();shuffle(c);return c.slice(0,n)}
+function round(){
+  locked=false;$("next").style.display="none";$("options").innerHTML="";$("kanji").textContent="…";
+  var four=pick(4);
+  Promise.all(four.map(function(k){return fetch(API+"/kanji/"+encodeURIComponent(k)).then(function(r){if(!r.ok)throw 0;return r.json()})}))
+  .then(function(ds){
+    var correct=ds[0];$("kanji").textContent=correct.kanji;
+    setStatus("Which meaning fits? どの意味？");
+    shuffle(ds).forEach(function(d){
+      var b=document.createElement("button");b.className="kc";b.style.background=d===correct?"":"";
+      b.textContent=(d.meanings&&d.meanings[0])||"?";
+      b.onclick=function(){
+        if(locked)return;locked=true;
+        if(d===correct){score++;streak++;setStatus("✔ "+correct.kanji+" — "+correct.meanings.slice(0,3).join(", ")+" · kun: "+(correct.kun_readings||[]).slice(0,2).join("、")+" · on: "+(correct.on_readings||[]).slice(0,2).join("、"),"ok")}
+        else{streak=0;setStatus("✘ It was “"+correct.meanings[0]+"”. This one means “"+(d.meanings&&d.meanings[0])+"”.","bad")}
+        $("score").textContent="score "+score+" · streak "+streak;
+        $("next").style.display="inline-block";
+      };
+      $("options").appendChild(b);
+    });
+  })
+  .catch(function(){setStatus("Couldn't reach kanjiapi.dev — check your connection and reload.","bad")});
+}
+$("next").onclick=round;
+fetch(API+"/kanji/grade-1").then(function(r){if(!r.ok)throw 0;return r.json()})
+.then(function(list){pool=list;round()})
+.catch(function(){setStatus("Couldn't load the kanji list (kanjiapi.dev unreachable). This kiosk needs internet.","bad")});
+</script></body></html>
