@@ -28,7 +28,8 @@ def tileset():
              "imageheight": ROWS_TS*TILE, "imagewidth": COLS_TS*TILE, "margin": 0,
              "name": "kanji-commons-placeholder", "spacing": 0,
              "tilecount": COLS_TS*ROWS_TS, "tileheight": TILE, "tilewidth": TILE,
-             "tiles": [{"id": 2, "properties": [{"name": "collides", "type": "bool", "value": True}]}]}]
+             "tiles": [{"id": i, "properties": [{"name": "collides", "type": "bool", "value": True}]}
+                       for i in (2, 6, 7, 8)]}]  # wall + poster/screen/body: furniture is solid (this map only)
 
 def props(d_):
     return [{"name": k, "type": ("bool" if isinstance(v, bool) else "string"), "value": v} for k, v in d_.items()]
@@ -108,7 +109,8 @@ STANDS = [
     ("duolingo",    "Duolingo",          "R", 13),
 ]
 ICON = {"L": "🕹", "R": "🏛"}
-PAD_GID = {"L": PURPLE, "R": BLUE}
+# pads must NOT share gids with the (now solid) terminal tiles — lantern = "walk here"
+PAD_GID = {"L": LANTERN, "R": LANTERN}
 
 deco = r.empty()
 voice_layers = []  # built after deco so draw order stays floor < deco < zones
