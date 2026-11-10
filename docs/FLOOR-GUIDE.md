@@ -64,10 +64,18 @@ six pads, check stamp count survives a reload, finish the rally in one browser a
 trophy popup in the other. Not testable before push (hosted play needs the public URL).
 
 ## Known state
-- **Not pushed** — repo commit policy: nothing goes public without David's go.
+- **Live since 10 Nov 2026** (commits `fa2e8ff`, `2e364ed`) — pushed on David's go, deployed
+  by the Pages workflow (~30 s per push).
+- Live-verified in an anonymous walkthrough on play.workadventu.re: map + script load, welcome
+  chat, all three popup variants (cabinet without build → Stamp ✔; museum ▶ Open — stamps even
+  when the browser blocks the tab; trophy progress list), 🎮 action-bar counter, stamp
+  persistence across reloads, jitsi café auto-join. Two bugs found in that walkthrough and
+  fixed in `2e364ed`: the café zone overlapped the Duolingo pad (walking up joined the call
+  uninvited), and stale popup references threw "Could not find popup" on zone-leave.
+- Not yet exercised live: the 6/6 completion fanfare + finisher counter (left for a real
+  first finisher) and the genkan exit (same exitUrl mechanism as the lab maps).
 - Placeholder tileset by design (same 16-color palette as the lab); the known upgrade path
   is a re-skin from the official Tuto/LPC tilesets (CC-BY-SA, attribution files in the
   platform clone) — see `DESIGN.md` §1 requirements.
-- Validated statically: JSON/layer sizes, JS syntax, zone↔CONFIG slug cross-check, popup
-  anchors present, start-to-every-zone walkability flood-fill. Live behavior (popups,
-  stamps, jitsi) untested until pushed.
+- Static checks (rerun after any regen): JSON/layer sizes, JS syntax, zone↔CONFIG slug
+  cross-check, popup anchors, start-to-every-zone walkability, zone-disjointness scan.
