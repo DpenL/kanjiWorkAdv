@@ -1,38 +1,42 @@
-/* Demo Floor — online. Six stations (3 arcade cabinets = the kanji games,
- * 3 museum plaques = the industry specimens), a stamp rally across all six,
- * a trophy pedestal with a finisher counter, poster wall + common board.
- * Same conventions as scripts/commons.js / scripts/lab/*: plain JS, CONFIG
- * block on top, everything degrades gracefully when a URL is empty. */
+/* Demo Floor — online. Every exhibit is a DEMOSTAND: a terminal + a poster +
+ * a voice table (jitsi zone, SPACE to join) so people can stand next to a
+ * player, watch a screen-share and discuss. CONFIG-driven and reusable:
+ * to add/swap a stand, edit STANDS in gen_floor_maps.py + one entry below,
+ * regen, push. Plain JS, same conventions as scripts/commons.js; everything
+ * degrades gracefully when a URL is empty.
+ *
+ * Quest rule: a stamp is earned ONLY by actually opening a demo (▶ Open).
+ * Stands without an online build don't count toward the rally total. */
 
 // ---- config (edit me) -------------------------------------------------------
 var CONFIG = {
-  stations: [
-    // kind "arcade" = playable kanji games (cabinets). url empty = cabinet not
-    // wired to an online build yet; the popup still shows and still stamps.
+  stands: [
+    // kind "arcade" = the kanji games (cabinets). url empty = not wired to an
+    // online build yet; the poster popup still shows, but no stamp until real.
     { slug: "dragontale", kind: "arcade", name: "DragonTale",
-      blurb: "RPG for learning Japanese kanji, developed and iterated at TUM over several years.",
+      poster: "RPG for learning Japanese kanji, developed and iterated at TUM over several years.",
       prompt: "Play the opening minutes without help. Note the first moment the game teaches you a kanji — how does it do it?",
       url: "", embed: false },                                   // ✎ web build URL when one exists
     { slug: "radfighters", kind: "arcade", name: "Radical Fighters",
-      blurb: "",                                                  // ✎ David's one-liner (PoC on the KanKyouKen platform)
+      poster: "",                                                 // ✎ David's one-liner (PoC on the KanKyouKen platform)
       prompt: "Play one round. Watch what the game seems to notice about you while you play.",
       url: "", embed: false },                                   // ✎ build URL
     { slug: "majikana", kind: "arcade", name: "Music to My Ears / Maji Kana",
-      blurb: "",                                                  // ✎ confirm build availability (as on the physical floor)
+      poster: "",                                                 // ✎ confirm build availability (as on the physical floor)
       prompt: "",
       url: "", embed: false },                                   // ✎ build URL
     // kind "museum" = look-and-compare exhibits; links open in a new tab
     // (these sites refuse to be iframed — embed stays false on purpose).
     { slug: "wanikani", kind: "museum", name: "WaniKani",
-      blurb: "Commercial web app: spaced repetition for ~2,000 kanji and ~6,000 words, taught through mnemonics and levels. Not a game in the play sense — a provocation about what “gamified” means.",
+      poster: "Commercial web app: spaced repetition for ~2,000 kanji and ~6,000 words, taught through mnemonics and levels. Not a game in the play sense — a provocation about what “gamified” means.",
       prompt: "Do a few review items. Notice what it does when you get one wrong — and how that feels.",
       url: "https://www.wanikani.com", embed: false },
     { slug: "anki", kind: "museum", name: "Anki (plain deck)",
-      blurb: "The baseline: a free SRS flashcard app with a community kanji deck. Pure repetition, no game. Here as the control — what every app on this floor is implicitly compared against.",
+      poster: "The baseline: a free SRS flashcard app with a community kanji deck. Pure repetition, no game. Here as the control — what every app on this floor is implicitly compared against.",
       prompt: "Review ten cards. Ask yourself what, if anything, would keep you coming back tomorrow.",
       url: "https://ankiweb.net", embed: false },
     { slug: "duolingo", kind: "museum", name: "Duolingo (Japanese)",
-      blurb: "The mass-market path: streaks, leagues, bite-size lessons; kanji appear inside general Japanese lessons. A provocation about engagement mechanics vs kanji-specific teaching.",
+      poster: "The mass-market path: streaks, leagues, bite-size lessons; kanji appear inside general Japanese lessons. A provocation about engagement mechanics vs kanji-specific teaching.",
       prompt: "Do one lesson. Count how often you produced a kanji versus merely tapped one.",
       url: "https://www.duolingo.com", embed: false }
   ],
@@ -47,6 +51,7 @@ var FINISHERS = "kc_floor_finishers";
 // ---- helpers ---------------------------------------------------------------
 var visited = {};
 var openP = null;
+var lastCafe = 0;
 function say(m) { try { WA.chat.sendChatMessage(m, GUIDE); } catch (e) { console.log("[floor]", m); } }
 function onEnter(layer, fn) { try { WA.room.onEnterLayer(layer).subscribe(fn); } catch (e) { console.warn("[floor]", layer, e); } }
 function onLeave(layer, fn) { try { WA.room.onLeaveLayer(layer).subscribe(fn); } catch (e) { console.warn("[floor]", layer, e); } }
@@ -61,31 +66,39 @@ function openUrl(url, embed) {
   if (embed) { try { WA.nav.openCoWebsite(url); return; } catch (e) { console.warn(e); } }
   try { WA.nav.openTab(url); } catch (e) { say(url); }
 }
-function count() { return Object.keys(visited).length; }
-function total() { return CONFIG.stations.length; }
+// quest: only stands with a real URL count ("stamp = you actually opened it")
+function wired() { return CONFIG.stands.filter(function (s) { return !!s.url; }); }
+function total() { return wired().length; }
+function count() { return wired().filter(function (s) { return visited[s.slug]; }).length; }
 function persist() {
   try { WA.player.state.saveVariable(STAMP_KEY, JSON.stringify(visited), { public: false, persist: true, scope: "world" }); }
   catch (e) { try { WA.player.state[STAMP_KEY] = JSON.stringify(visited); } catch (e2) {} }
 }
-function progressLines() {
-  return CONFIG.stations.map(function (s) {
-    return (visited[s.slug] ? "✅ " : "⬜ ") + s.name;
+// bullet list that still reads OK if the client collapses newlines
+function bulletList() {
+  return CONFIG.stands.map(function (s) {
+    if (!s.url) return "• 🔧 " + s.name + " (coming soon)";
+    return "• " + (visited[s.slug] ? "✅ " : "⬜ ") + s.name;
   }).join("\n");
+}
+function missingNames() {
+  return wired().filter(function (s) { return !visited[s.slug]; })
+    .map(function (s) { return s.name; }).join(", ");
 }
 function refreshBtn() {
   try { WA.ui.actionBar.removeButton("floor-progress"); } catch (e) {}
   try {
     WA.ui.actionBar.addButton({ id: "floor-progress", label: "🎮 " + count() + "/" + total(),
-      callback: function () { say("Stamp rally:\n" + progressLines()); } });
+      callback: function () { say("Stamp rally " + count() + "/" + total() + "\n" + bulletList()); } });
   } catch (e) { console.warn("[floor] actionBar", e); }
 }
 function stamp(s) {
-  if (visited[s.slug]) return;
+  if (!s.url || visited[s.slug]) return;
   visited[s.slug] = true; persist(); refreshBtn();
   say("📍 Stamp: " + s.name + " (" + count() + "/" + total() + ")");
-  if (count() === total()) {
+  if (count() === total() && total() > 0) {
     bumpFinishers();
-    say("🎉 All " + total() + " stamps! Walk to the 🏆 pedestal in the centre of the floor.");
+    say("🎉 " + total() + "/" + total() + " — you've tried everything that's online so far. The 🏆 pedestal salutes you; leave a line on the 📌 board!");
   }
 }
 function bumpFinishers() {
@@ -106,30 +119,38 @@ WA.onInit().then(function () {
     if (saved) visited = JSON.parse(saved);
   } catch (e) {}
   refreshBtn();
-  say("Welcome to the demo floor, online edition. 🕹 cabinets left (the kanji games), 🏛 museum wall right (the apps they get compared to). Stamp all " + total() + " stations, then visit the 🏆.");
+  say("Welcome to the Kanji Commons demo floor. Every stand is a poster + a demo: walk up, read, ▶ Open to try it — that's what earns the stamp.");
+  if (total() > 0) {
+    say("Stamp rally " + count() + "/" + total() + " — track it with the 🎮 button in the top bar.\n" + bulletList());
+  }
 
-  CONFIG.stations.forEach(function (s) {
-    var zone = "zone_station_" + s.slug;
+  CONFIG.stands.forEach(function (s) {
+    var zone = "zone_stand_" + s.slug;
     onEnter(zone, function () {
-      var txt = s.name + "\n" + (s.blurb || "This cabinet isn't wired to an online build yet — stamped visits still count.") + (s.prompt ? "\n\nTry: " + s.prompt : "");
+      var txt = "【" + s.name + "】 " + (s.poster || "");
+      if (s.prompt) txt += "  ▶ Try: " + s.prompt;
       var buttons = [];
       if (s.url) {
         buttons.push({ label: "▶ Open", className: "primary", callback: function (p) { openUrl(s.url, s.embed); stamp(s); done(p); } });
+        buttons.push({ label: "Later", className: "normal", callback: function (p) { done(p); } });
       } else {
-        buttons.push({ label: "Stamp ✔", className: "primary", callback: function (p) { stamp(s); done(p); } });
+        txt += "  (⏳ online build coming soon — doesn't count toward the rally yet.)";
+        buttons.push({ label: "OK", className: "normal", callback: function (p) { done(p); } });
       }
-      buttons.push({ label: "Later", className: "normal", callback: function (p) { done(p); } });
       popup("popup_" + s.slug, txt, buttons);
     });
     onLeave(zone, closeP);
   });
 
   onEnter("zone_trophy", function () {
-    var done = count() === total();
-    var msg = done
-      ? "🏆 Stamp rally complete — thanks for touring the whole floor!\nFinishers so far: " + (finishers() || "—") + "\nLeave a note on the 📌 board so the in-person crowd hears from you."
-      : "Stamp rally: " + count() + "/" + total() + "\n\n" + progressLines();
-    popup("popup_trophy", msg, [{ label: "OK", className: "normal", callback: function (p) { done(p); } }]);
+    var c = count(), t = total();
+    var complete = t > 0 && c === t;
+    var msg = complete
+      ? "🏆 " + c + "/" + t + " — you've tried everything that's online so far! Finishers: " + (finishers() || "—") + ". Leave a line on the 📌 board so the in-person crowd hears from you."
+      : "🏆 スタンプラリー " + c + "/" + t + (t > 0 ? " — missing: " + missingNames() : "");
+    popup("popup_trophy", msg, [
+      { label: "List", className: "normal", callback: function (p) { say("Stamp rally " + c + "/" + t + "\n" + bulletList()); done(p); } },
+      { label: "OK", className: "primary", callback: function (p) { done(p); } }]);
   });
   onLeave("zone_trophy", closeP);
 
@@ -152,5 +173,8 @@ WA.onInit().then(function () {
   });
   onLeave("zone_board", closeP);
 
-  onEnter("zone_cafe", function () { say("🍵 Floor café — step in to join the voice room."); });
+  onEnter("zone_cafe", function () {
+    var now = Date.now();
+    if (now - lastCafe > 60000) { lastCafe = now; say("🍵 Floor café — step in to join the voice room."); }
+  });
 }).catch(function (e) { console.error("WA init failed", e); });

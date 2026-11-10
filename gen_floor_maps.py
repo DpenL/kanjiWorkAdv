@@ -1,14 +1,18 @@
 #!/usr/bin/env python3
-"""Generate the Demo Floor room (maps/floor/floor.tmj) — the session-1 demo
-floor, online: arcade wing (the kanji games) + museum wall (the industry
-specimens) + stamp rally + trophy + cafe.
+"""Generate the Demo Floor room (maps/floor/floor.tmj).
+
+Core entity: the DEMOSTAND — a reusable exhibit unit, one per demo:
+  terminal (screen+body tiles) + poster above it + a walk-up pad that opens
+  the poster popup + a VOICE RING (jitsi zone, SPACE to join) so spectators
+  can stand next to a player, watch a screen-share and discuss.
+To add/swap a demo: add a line to STANDS below + one entry to
+CONFIG.stands in scripts/floor/floor.js (same slug), then `py gen_floor_maps.py`.
+Floor plan is intentionally provisional; stands are the stable unit.
 
 Standalone on purpose, same contract as gen_lab_maps.py: does NOT touch
 tileset.png, genkan.tmj, commons.tmj or maps/lab/* — reuses the shared
-placeholder tileset via a relative path. Station zone layers are named
-zone_station_<slug>; slugs must match CONFIG.stations in
-scripts/floor/floor.js (cross-checked by eye + the validation snippet in
-docs/FLOOR-GUIDE.md).
+placeholder tileset via a relative path. Validation: scratchpad check script
+(slug cross-check, anchors, walkability, zone disjointness, voice⊇pad).
 """
 import json, os
 
@@ -77,7 +81,7 @@ class Room:
         self.layers.append({"draworder": "topdown", "id": self.lid, "name": "floorLayer",
                             "objects": self.objects, "opacity": 1, "type": "objectgroup",
                             "visible": True, "x": 0, "y": 0}); self.lid += 1
-        self.tl("start", s, opacity=0.6)
+        self.tl("start", s, opacity=0.35)  # subtle: don't let spawn read as a second trophy
         m = {"compressionlevel": -1, "height": self.H, "width": self.W, "infinite": False,
              "layers": self.layers, "nextlayerid": self.lid, "nextobjectid": self.oid,
              "orientation": "orthogonal", "renderorder": "right-down", "tiledversion": "1.10.2",
@@ -92,30 +96,48 @@ W, H = 30, 18
 r = Room(W, H); floor, walls = r.frame()
 r.tl("floor", floor)
 
-# ---------------- arcade wing (left wall): the kanji games ----------------
-# cabinet = BLUE screen row + PURPLE body row against the wall; zone pad in front
-ARCADE = [("dragontale", "DragonTale", 3), ("radfighters", "Radical Fighters", 8), ("majikana", "Maji Kana", 13)]
-deco_cab = r.empty()
-for slug, name, y in ARCADE:
-    r.fill(deco_cab, 1, y, 2, y, BLUE)       # screen
-    r.fill(deco_cab, 1, y+1, 2, y+1, PURPLE) # body
-r.tl("deco_cabinets", deco_cab)
-for slug, name, y in ARCADE:
-    r.zone(f"zone_station_{slug}", 3, y, 4, y+1, PURPLE, opacity=0.5)
-    r.label(1, y-1.0, 6, f"🕹 {name}")
-    r.anchor(f"popup_{slug}", 3, y-1)
+# ---------------- demostands ----------------
+# (slug, label, side L|R, y). Slugs must match CONFIG.stands in scripts/floor/floor.js.
+# L wing = the kanji games (🕹), R wing = the industry comparison exhibits (🏛).
+STANDS = [
+    ("dragontale",  "DragonTale",        "L", 3),
+    ("radfighters", "Radical Fighters",  "L", 8),
+    ("majikana",    "Maji Kana",         "L", 13),
+    ("wanikani",    "WaniKani",          "R", 3),
+    ("anki",        "Anki",              "R", 8),
+    ("duolingo",    "Duolingo",          "R", 13),
+]
+ICON = {"L": "🕹", "R": "🏛"}
+PAD_GID = {"L": PURPLE, "R": BLUE}
 
-# ---------------- museum wall (right wall): the industry specimens ----------------
-MUSEUM = [("wanikani", "WaniKani", 3), ("anki", "Anki", 8), ("duolingo", "Duolingo", 13)]
-deco_plq = r.empty()
-for slug, name, y in MUSEUM:
-    r.fill(deco_plq, 27, y, 28, y, PAPER)    # framed exhibit
-    r.fill(deco_plq, 27, y+1, 28, y+1, INK)  # pedestal / plaque
-r.tl("deco_plaques", deco_plq)
-for slug, name, y in MUSEUM:
-    r.zone(f"zone_station_{slug}", 25, y, 26, y+1, BLUE, opacity=0.5)
-    r.label(24, y-1.0, 5, f"🏛 {name}")
-    r.anchor(f"popup_{slug}", 24, y-1)
+deco = r.empty()
+voice_layers = []  # built after deco so draw order stays floor < deco < zones
+for slug, label, side, y in STANDS:
+    if side == "L":
+        tx, px, vx = 1, 3, 3          # terminal x, pad x, voice-ring x0
+    else:
+        tx, px, vx = 27, 25, 24
+    # terminal: screen row + body row against the wall; poster sheet above it
+    r.fill(deco, tx, y,   tx+1, y,   BLUE)    # screen
+    r.fill(deco, tx, y+1, tx+1, y+1, PURPLE)  # body
+    r.fill(deco, tx, y-1, tx+1, y-1, PAPER)   # poster above the terminal
+    lx = tx + 0.1 if side == "L" else tx - 1.4   # right wing: keep text inside the map
+    r.label(lx, y-1+0.06, 4, f"{ICON[side]} {label}")
+    # voice ring: jitsi table incl. the pad, SPACE to join (spectate + discuss)
+    voice_layers.append((f"voice_{slug}", vx, y-1, vx+2, y+1,
+                         {"jitsiRoom": f"kc-stand-{slug}",
+                          "jitsiTrigger": "onaction",
+                          "jitsiTriggerMessage": f"{label} voice table — watch & discuss"}))
+    # pad: walking on it opens the poster popup (zone handled in floor.js)
+    # (added after deco below so the zone draws above the voice tint)
+r.tl("deco_stands", deco)
+for name, x0, y0, x1, y1, p in voice_layers:
+    l = r.empty(); r.fill(l, x0, y0, x1, y1, INK)
+    r.tl(name, l, p, 0.18)
+for slug, label, side, y in STANDS:
+    px = 3 if side == "L" else 25
+    r.zone(f"zone_stand_{slug}", px, y, px+1, y+1, PAD_GID[side], opacity=0.5)
+    r.anchor(f"popup_{slug}", (3 if side == "L" else 24), y-1)
 
 # ---------------- top nook: poster wall + common board ----------------
 r.zone("zone_poster", 11, 1, 12, 2, LANTERN, opacity=0.8)
@@ -143,7 +165,7 @@ r.label(1.2, 16.0, 5, "→ 玄関 Genkan")
 
 # ---------------- signage ----------------
 r.label(10.5, 4.4, 9, "ゲームフロア\nDEMO FLOOR — online", 13)
-r.label(9.5, 15.2, 12, "Walk onto a glowing pad → popup → stamp.\nAll 6 stamps? Visit the 🏆 in the centre.")
+r.label(9.5, 15.2, 12, "Stand = poster + demo: walk up, ▶ Open to try (= stamp).\n🎙 grey ring = voice table (SPACE). 🏆 centre = progress.")
 
 # world variable: completion counter shown at the trophy
 r.variable("kc_floor_finishers", "0")
@@ -151,6 +173,6 @@ r.variable("kc_floor_finishers", "0")
 layers = r.dump(f"{OUT}/floor.tmj",
     {"script": "../../scripts/floor/floor.js",
      "mapName": "Demo Floor — online",
-     "mapDescription": "The workshop demo floor, online: arcade cabinets for the kanji games, a museum wall for the industry apps, and a stamp rally across all six."},
+     "mapDescription": "The workshop demo floor, online: demostands for the kanji games and the industry apps they get compared to, a stamp rally across the wired ones, and voice tables for watching over a player's shoulder."},
     walls, (14, 13, 15, 14))
 print("floor.tmj layers:", layers)
