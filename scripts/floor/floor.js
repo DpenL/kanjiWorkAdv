@@ -51,6 +51,7 @@ function say(m) { try { WA.chat.sendChatMessage(m, GUIDE); } catch (e) { console
 function onEnter(layer, fn) { try { WA.room.onEnterLayer(layer).subscribe(fn); } catch (e) { console.warn("[floor]", layer, e); } }
 function onLeave(layer, fn) { try { WA.room.onLeaveLayer(layer).subscribe(fn); } catch (e) { console.warn("[floor]", layer, e); } }
 function closeP() { if (openP) { try { openP.close(); } catch (e) {} openP = null; } }
+function done(p) { try { p.close(); } catch (e) {} openP = null; }
 function popup(anchor, msg, buttons) {
   closeP();
   try { openP = WA.ui.openPopup(anchor, msg, buttons); }
@@ -113,11 +114,11 @@ WA.onInit().then(function () {
       var txt = s.name + "\n" + (s.blurb || "This cabinet isn't wired to an online build yet — stamped visits still count.") + (s.prompt ? "\n\nTry: " + s.prompt : "");
       var buttons = [];
       if (s.url) {
-        buttons.push({ label: "▶ Open", className: "primary", callback: function (p) { openUrl(s.url, s.embed); stamp(s); p.close(); } });
+        buttons.push({ label: "▶ Open", className: "primary", callback: function (p) { openUrl(s.url, s.embed); stamp(s); done(p); } });
       } else {
-        buttons.push({ label: "Stamp ✔", className: "primary", callback: function (p) { stamp(s); p.close(); } });
+        buttons.push({ label: "Stamp ✔", className: "primary", callback: function (p) { stamp(s); done(p); } });
       }
-      buttons.push({ label: "Later", className: "normal", callback: function (p) { p.close(); } });
+      buttons.push({ label: "Later", className: "normal", callback: function (p) { done(p); } });
       popup("popup_" + s.slug, txt, buttons);
     });
     onLeave(zone, closeP);
@@ -128,26 +129,26 @@ WA.onInit().then(function () {
     var msg = done
       ? "🏆 Stamp rally complete — thanks for touring the whole floor!\nFinishers so far: " + (finishers() || "—") + "\nLeave a note on the 📌 board so the in-person crowd hears from you."
       : "Stamp rally: " + count() + "/" + total() + "\n\n" + progressLines();
-    popup("popup_trophy", msg, [{ label: "OK", className: "normal", callback: function (p) { p.close(); } }]);
+    popup("popup_trophy", msg, [{ label: "OK", className: "normal", callback: function (p) { done(p); } }]);
   });
   onLeave("zone_trophy", closeP);
 
   onEnter("zone_poster", function () {
     if (CONFIG.posterUrl) {
       popup("popup_poster", "The worlds poster and the session-1 card decks live here.", [
-        { label: "▶ Open", className: "primary", callback: function (p) { openUrl(CONFIG.posterUrl, false); p.close(); } },
-        { label: "Later", className: "normal", callback: function (p) { p.close(); } }]);
+        { label: "▶ Open", className: "primary", callback: function (p) { openUrl(CONFIG.posterUrl, false); done(p); } },
+        { label: "Later", className: "normal", callback: function (p) { done(p); } }]);
     } else {
       popup("popup_poster", "Poster wall — materials link not wired yet (CONFIG.posterUrl).", [
-        { label: "OK", className: "normal", callback: function (p) { p.close(); } }]);
+        { label: "OK", className: "normal", callback: function (p) { done(p); } }]);
     }
   });
   onLeave("zone_poster", closeP);
 
   onEnter("zone_board", function () {
     popup("popup_board", "掲示板 — the common board. Leave a line: what you tried, what surprised you.", [
-      { label: "▶ Open board", className: "primary", callback: function (p) { openUrl(CONFIG.boardUrl, false); p.close(); } },
-      { label: "Later", className: "normal", callback: function (p) { p.close(); } }]);
+      { label: "▶ Open board", className: "primary", callback: function (p) { openUrl(CONFIG.boardUrl, false); done(p); } },
+      { label: "Later", className: "normal", callback: function (p) { done(p); } }]);
   });
   onLeave("zone_board", closeP);
 

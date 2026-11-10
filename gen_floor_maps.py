@@ -132,8 +132,8 @@ r.label(12.5, 6.35, 7, "🏆 スタンプラリー")
 r.anchor("popup_trophy", 13, 6, w=4)
 
 # ---------------- cafe corner (voice) ----------------
-r.zone("zone_cafe", 24, 14, 28, 16, TATAMI, {"jitsiRoom": "kc-floor-cafe"}, opacity=1.0)
-r.label(24.1, 14.05, 6, "🍵 Floor café — voice")
+r.zone("zone_cafe", 24, 15, 28, 16, TATAMI, {"jitsiRoom": "kc-floor-cafe"}, opacity=1.0)
+r.label(24.1, 15.08, 6, "🍵 Floor café — voice")
 
 # ---------------- exit to genkan (bottom-left) ----------------
 for x in range(2, 4): walls[17*W+x] = 0
