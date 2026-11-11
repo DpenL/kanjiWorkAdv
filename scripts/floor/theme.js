@@ -29,7 +29,7 @@ var CONFIG = {
     { slug: "kanjicats", name: "Kanji Cats",
       poster: "Playable demo on Steam — ▶ opens the store page (play via Steam).",
       prompt: "",
-      url: "https://store.steampowered.com/app/3830660/Kanji_Cats_Demo/", embed: false },
+      url: "https://store.steampowered.com/app/3830660/Kanji_Cats_Demo/", embed: true },
     { slug: "nihongosdx", name: "Nihongo Showdown DX",
       poster: "Build on itch.io — ▶ opens the game page.",
       prompt: "",
