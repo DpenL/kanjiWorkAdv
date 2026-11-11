@@ -29442,7 +29442,7 @@
    "height": 30,
    "width": 44,
    "id": 22,
-   "name": "voice_bbv01",
+   "name": "voice_Zen Hanzi",
    "opacity": 0,
    "type": "tilelayer",
    "visible": true,
@@ -29452,7 +29452,7 @@
     {
      "name": "jitsiRoom",
      "type": "string",
-     "value": "kc-stand-bbv01"
+     "value": "kc-stand-Zen Hanzi"
     },
     {
      "name": "jitsiTrigger",
@@ -29462,7 +29462,7 @@
     {
      "name": "jitsiTriggerMessage",
      "type": "string",
-     "value": "bbv01 voice table \u2014 watch & discuss"
+     "value": "Zen Hanzi voice table \u2014 watch & discuss"
     }
    ]
   },
@@ -30792,7 +30792,7 @@
    "height": 30,
    "width": 44,
    "id": 23,
-   "name": "zone_stand_bbv01",
+   "name": "zone_stand_Zen Hanzi",
    "opacity": 0,
    "type": "tilelayer",
    "visible": true,
@@ -43148,7 +43148,7 @@
     },
     {
      "id": 21,
-     "name": "popup_bbv01",
+     "name": "popup_Zen Hanzi",
      "rotation": 0,
      "type": "",
      "visible": true,
@@ -43162,7 +43162,7 @@
      "name": "lbl22",
      "rotation": 0,
      "text": {
-      "text": "bbv01",
+      "text": "Zen Hanzi",
       "wrap": true,
       "color": "#2E2A33",
       "fontfamily": "sans-serif",

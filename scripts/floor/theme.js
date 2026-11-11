@@ -34,7 +34,7 @@ var CONFIG = {
       poster: "Build on itch.io — ▶ opens the game page.",
       prompt: "",
       url: "https://arbigaus.itch.io/nihongo-showdown-dx", embed: false },
-    { slug: "bbv01", name: "bbv01",
+    { slug: "Zen Hanzi", name: "ZenHanzi",
       poster: "Build on itch.io — ▶ opens the game page.",
       prompt: "",
       url: "https://saya1984.itch.io/bbv01", embed: false },
