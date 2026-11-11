@@ -1,5 +1,9 @@
 # Tileset provenance — maps/floor/tilesets/
 
+`kc_commons.png` is an **original Kanji Commons pack** (demo booths, walk-up
+pads, dark arcade walls, floor, exit mats) drawn for this repo — **CC0**,
+use it however you like. Generator: `draw_pack.py` (session scratchpad).
+
 `kc_base.png` and `kc_objects.png` are repacked selections (unmodified pixels,
 rearranged into two compact sheets) from tilesets distributed with the
 **official WorkAdventure preset world repositories**:
