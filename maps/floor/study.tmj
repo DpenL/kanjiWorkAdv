@@ -29442,7 +29442,7 @@
    "height": 30,
    "width": 44,
    "id": 22,
-   "name": "voice_Zen Hanzi",
+   "name": "voice_zen_hanzi",
    "opacity": 0,
    "type": "tilelayer",
    "visible": true,
@@ -29452,7 +29452,7 @@
     {
      "name": "jitsiRoom",
      "type": "string",
-     "value": "kc-stand-Zen Hanzi"
+     "value": "kc-stand-"
     },
     {
      "name": "jitsiTrigger",
@@ -30792,7 +30792,7 @@
    "height": 30,
    "width": 44,
    "id": 23,
-   "name": "zone_stand_Zen Hanzi",
+   "name": "zone_stand_zen_hanzi",
    "opacity": 0,
    "type": "tilelayer",
    "visible": true,
@@ -43148,7 +43148,7 @@
     },
     {
      "id": 21,
-     "name": "popup_Zen Hanzi",
+     "name": "popup_zen_hanzi",
      "rotation": 0,
      "type": "",
      "visible": true,

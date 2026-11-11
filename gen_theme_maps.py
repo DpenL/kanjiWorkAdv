@@ -184,7 +184,7 @@ class Room:
 STANDS = [
     ("dragontale",  "DragonTale"), ("radfighters", "Radical Fighters"),
     ("majikana",    "Maji Kana"),  ("kanjicats",   "Kanji Cats"),
-    ("nihongosdx",  "Nihongo Showdown DX"), ("bbv01", "bbv01"),
+    ("nihongosdx",  "Nihongo Showdown DX"), ("Zen Hanzi", "Zen Hanzi"),
     ("kanjistriker","Kanji Striker"), ("wanikani", "WaniKani"),
     ("anki",        "Anki"), ("duolingo", "Duolingo"),
 ]
@@ -257,7 +257,7 @@ def build_study():
         if y < 12: r.obj(7, y + 2, "bonsai")
         booth(r, slug, pad=(9, y), voice=(7, y - 1, 11, y + 2), label_at=(8.7, y + 2.1))
     # E wall: public demos (display cabinets)
-    for slug, y in [("kanjicats", 6), ("nihongosdx", 9), ("bbv01", 12)]:
+    for slug, y in [("kanjicats", 6), ("nihongosdx", 9), ("Zen Hanzi", 12)]:
         r.obj(31, y - 1, "dispcab_a")
         booth(r, slug, pad=(29, y), voice=(28, y - 1, 32, y + 1), label_at=(28.4, y + 2.1))
     # Kanji Striker nook (centre-south)
@@ -362,7 +362,7 @@ def build_arcade():
     cabs = ["arcade1", "arcade2", "arcade3"]
     banners = ["banner_crest", "banner_purple"]
     for i, (x, slug) in enumerate([(2, "dragontale"), (7, "radfighters"), (12, "majikana"),
-                                   (17, "kanjicats"), (22, "nihongosdx"), (27, "bbv01"), (32, "kanjistriker")]):
+                                   (17, "kanjicats"), (22, "nihongosdx"), (27, "Zen Hanzi"), (32, "kanjistriker")]):
         r.obj(x, 13, cabs[i % 3])
         r.obj(x + 2, 11, banners[i % 2], solid=False)
         booth(r, slug, pad=(x, 16), voice=(x - 1, 13, x + 2, 18),
