@@ -10,7 +10,7 @@ var STANDS = [
     url: "https://store.steampowered.com/app/3830660/Kanji_Cats_Demo/" },
   { slug: "nihongosdx", name: "Nihongo Showdown DX",
     url: "https://arbigaus.itch.io/nihongo-showdown-dx" },
-  { slug: "bbv01", name: "bbv01",
+  { slug: "bbv01", name: "Zen Hanzi",
     url: "https://saya1984.itch.io/bbv01" },
   { slug: "kanjistriker", name: "Kanji Striker",
     urls: [

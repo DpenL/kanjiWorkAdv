@@ -146,7 +146,7 @@ class Room:
 BOOTHS = [  # (slug, label, side L|R, slot 0..2)
     ("kanjicats",    "Kanji Cats",          "L", 0),
     ("nihongosdx",   "Nihongo Showdown DX", "L", 1),
-    ("bbv01",        "bbv01",               "L", 2),
+    ("bbv01",        "Zen Hanzi",           "L", 2),
     ("kanjistriker", "Kanji Striker",       "R", 0),
     ("wanikani",     "WaniKani",            "R", 1),
     ("anki",         "Anki",                "R", 2),
